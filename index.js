@@ -1,7 +1,7 @@
 var Docxtemplater = require('docxtemplater');
 var JSZip = require('jszip');
 
-const mergeDocuments = (firstDocument, files, isDraft) => {
+export const mergeDocuments = (firstDocument, files, isDraft) => {
   String.prototype.splice = function (idx, rem, str) {
     return this.slice(0, idx) + str + this.slice(idx + Math.abs(rem));
   };
