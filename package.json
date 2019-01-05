@@ -1,0 +1,16 @@
+{
+  "name": "altchunk",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "docxtemplater": "3.0.11",
+    "jszip": "2.6.1",
+    "xml-js": "1.6.8"
+  }
+}
