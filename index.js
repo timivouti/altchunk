@@ -64,9 +64,9 @@ export const mergeDocuments = (firstDocument, files, isDraft) => {
   files.map((x, i) => {
     zip.file(`word/afchunk${i + 1}.docx`, x, { binary: true });
     try {
-      newDocument = newDocument.splice(document.lastIndexOf("<w:sectPr"), 0, `<w:altChunk r:id="AltChunkId${i + 1}"/>`);
+      newDocument = newDocument.splice(newDocument.lastIndexOf("<w:sectPr"), 0, `<w:altChunk r:id="AltChunkId${i + 1}"/>`);
 
-      newDocumentXmlRels = newDocumentXmlRels.splice(documentXmlRels.indexOf("</Relationships>"), 0, `<Relationship Id="AltChunkId${i + 1}" Target="/word/afchunk${i + 1}.docx" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/aFChunk"/>`);
+      newDocumentXmlRels = newDocumentXmlRels.splice(newDocumentXmlRels.indexOf("</Relationships>"), 0, `<Relationship Id="AltChunkId${i + 1}" Target="/word/afchunk${i + 1}.docx" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/aFChunk"/>`);
     } catch (err) {
       console.log(err);
     }
