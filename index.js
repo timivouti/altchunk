@@ -50,21 +50,40 @@ export const mergeDocuments = (firstDocument, files, isDraft) => {
   var newDocumentXmlRels = documentXmlRels;
 
   var contentType = utf8ArrayToString(zip.file("[Content_Types].xml")._data.getContent());
-  var newContentType = contentType.splice(contentType.indexOf("</Types>"), 0, `<Default ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml" Extension="docx"/>`);
+  var newContentType = contentType;
+  if (!contentType.includes(`<Default ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml" Extension="docx"/>`)) {
+    newContentType = newContentType.splice(contentType.indexOf("</Types>"), 0, `<Default ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml" Extension="docx"/>`);
+  }
 
-  zip.file("[Content_Types].xml", newContentType.replace(` standalone="true"`, ""))
+  zip.file("[Content_Types].xml", newContentType.replace(` standalone="true"`, ""));
+
+  let notNull = true;
+  let howManyAltChunksFound = 0;
+  let loop = 1;
+
+  do {
+    if (zip.file(`word/afchunk${loop}.docx`) != null) {
+      loop++;
+      howManyAltChunksFound++;
+    } else {
+      notNull = false;
+    }
+  } while (notNull);
 
   if (isDraft && zip.file("word/header3.xml") != null) {
     var addHeader = utf8ArrayToString(zip.file("word/header3.xml")._data.getContent());
-    var newHeader = addHeader.splice(addHeader.indexOf(`</w:pPr>`) + 8, 0, watermark);
-    zip.file("word/header3.xml", newHeader);
+    if (!addHeader.includes(watermark)) {
+      var newHeader = addHeader.splice(addHeader.indexOf(`</w:pPr>`) + 8, 0, watermark);
+      zip.file("word/header3.xml", newHeader);
+    }
   }
 
   files.map((x, i) => {
-    zip.file(`word/afchunk${i + 1}.docx`, x, { binary: true });
-    newDocument = newDocument.splice(newDocument.lastIndexOf("<w:sectPr"), 0, `<w:altChunk r:id="AltChunkId${i + 1}"/>`);
+    const altChunkId = howManyAltChunksFound + (i + 1);
+    zip.file(`word/afchunk${altChunkId}.docx`, x, { binary: true });
+    newDocument = newDocument.splice(newDocument.lastIndexOf("<w:sectPr"), 0, `<w:altChunk r:id="AltChunkId${altChunkId}"/>`);
 
-    newDocumentXmlRels = newDocumentXmlRels.splice(newDocumentXmlRels.indexOf("</Relationships>"), 0, `<Relationship Id="AltChunkId${i + 1}" Target="/word/afchunk${i + 1}.docx" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/aFChunk"/>`);
+    newDocumentXmlRels = newDocumentXmlRels.splice(newDocumentXmlRels.indexOf("</Relationships>"), 0, `<Relationship Id="AltChunkId${altChunkId}" Target="/word/afchunk${altChunkId}.docx" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/aFChunk"/>`);
   });
 
   zip.file("word/document.xml", newDocument);
