@@ -78,6 +78,13 @@ export const mergeDocuments = (firstDocument, files, isDraft) => {
     }
   }
 
+  if (zip.file("word/docProps/custom.xml") != null) {
+    var addCustomXml = utf8ArrayToString(zip.file("word/docProps/custom.xml")._data.getContent());
+    var newCustomXml = addCustomXml.replace("0x0101008FF0A72AFE67D442B57B8AACC253BDB7005D0E72A7CB9D6E458F65F43B2D3DBB6D", "0x010100C8CB6112EF7BD440B47A9D66E3EE21B00043AB5F92ADB0874286AA9CE9D68ADE37");
+    newCustomXml = newCustomXml.splice(newCustomXml.indexOf("</Properties>"), 0, `<property name="Kera_Dokumentin tila" pid="12" fmtid="{D5CDD505-2E9C-101B-9397-08002B2CF9AE}"><vt:lpwstr>${isDraft ? "Luonnos" : "Julkaisu"}</vt:lpwstr></property>`);
+    zip.file("word/docProps/custom.xml", newCustomXml);
+  }
+
   files.map((x, i) => {
     const altChunkId = howManyAltChunksFound + (i + 1);
     zip.file(`word/afchunk${altChunkId}.docx`, x, { binary: true });
