@@ -90,7 +90,7 @@ export const mergeDocuments = (firstDocument, files, isDraft) => {
         zip.file("docProps/custom.xml", isDraft ? addCustomXml.replace("Julkaisu", "Luonnos") : addCustomXml);
       }
     } else {
-      var newCustomXml = addCustomXml.splice(newCustomXml.indexOf("</Properties>"), 0, `<property name="Kera_Dokumentin tila" pid="${count}" fmtid="{D5CDD505-2E9C-101B-9397-08002B2CF9AE}"><vt:lpwstr>${isDraft ? "Luonnos" : "Julkaisu"}</vt:lpwstr></property>`);
+      var newCustomXml = addCustomXml.splice(addCustomXml.indexOf("</Properties>"), 0, `<property name="Kera_Dokumentin tila" pid="${count}" fmtid="{D5CDD505-2E9C-101B-9397-08002B2CF9AE}"><vt:lpwstr>${isDraft ? "Luonnos" : "Julkaisu"}</vt:lpwstr></property>`);
       zip.file("docProps/custom.xml", newCustomXml);
     }
   }
